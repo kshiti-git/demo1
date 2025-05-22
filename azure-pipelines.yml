@@ -7,7 +7,7 @@ trigger:
 - main
 
 pool:
-  vmImage: 'ubuntu-latest' # ✅ This uses Microsoft-hosted agent
+  name: 'Default' # ✅ This uses Microsoft-hosted agent
 
 steps:
 - script: echo "✅ Hello, your pipeline is running using Microsoft-hosted agent"
