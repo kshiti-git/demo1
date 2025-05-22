@@ -6,29 +6,29 @@ trigger:
 - main
 
 pool:
-  name: Default  # Use your self-hosted agent pool name
+  name: Default  # Your agent pool name
+
+variables:
+  STORAGE_ACCOUNT_NAME: kshitijastore2          # Your storage account name
+  CONTAINER_NAME: mycontainer                   # Your container name where blob is uploaded
 
 steps:
 - script: |
+    echo "Copying drop.zip to staging folder..."
     copy "C:\Users\Kshitija\drop.zip" "$(Build.ArtifactStagingDirectory)\drop.zip"
   displayName: 'Copy drop.zip to staging folder'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)\drop.zip'
-    ArtifactName: 'drop'
-  displayName: 'Publish drop.zip as artifact'
-
 - task: AzureCLI@2
   inputs:
-    azureSubscription: 'ServiceConnection_Automatic'  # Replace with your real service connection name
+    azureSubscription: 'ServiceConnection_Automatic'  # Your service connection name
     scriptType: 'ps'
     scriptLocation: 'inlineScript'
     inlineScript: |
       az storage blob upload `
-        --account-name kshitijastore2 `
-        --container-name mycontainer `
+        --account-name $(STORAGE_ACCOUNT_NAME) `
+        --container-name $(CONTAINER_NAME) `
         --name drop.zip `
         --file "$(Build.ArtifactStagingDirectory)\drop.zip" `
-        --auth-mode login
-  displayName: 'Upload drop.zip to Azure Blob Storage'
+        --auth-mode key `
+        --account-key $(STORAGE_ACCOUNT_KEY)
+  displayName: 'Upload drop.zip to Azure Blob Storage using Storage Account Key'
