@@ -18,3 +18,19 @@ steps:
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)\drop.zip'
     ArtifactName: 'drop'
+
+# Upload to Azure Blob
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'ServiceConnection_Automatic'  # Replace with your service connection name
+    scriptType: 'ps'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az storage blob upload `
+        --account-name kshitijastore1`
+        --container-name mycontainer `
+        --name drop.zip `
+        --file "$(Build.ArtifactStagingDirectory)\drop.zip" `
+        --auth-mode login
+  displayName: 'Upload to Azure Blob Storage'
+
