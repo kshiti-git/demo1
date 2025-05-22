@@ -4,11 +4,23 @@
 # https://aka.ms/yaml
 
 trigger:
-- main
+- main  # or your branch name
 
 pool:
-  name: 'Default' # ✅ This uses Microsoft-hosted agent
+  name: Default   # 🧠 Use your self-hosted agent pool name
+
+variables:
+  buildConfiguration: 'Release'
 
 steps:
-- script: echo "✅ Hello, your pipeline is running using Microsoft-hosted agent"
-  displayName: "Run echo command"
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '7.0.x'   # ✅ Change if your project uses another version
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+
+- script: dotnet restore
+  displayName: '🔧 Restore dependencies'
+
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: '🏗️ Build the project'
