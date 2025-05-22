@@ -7,40 +7,14 @@ trigger:
 - main
 
 pool:
-  name: Default
+  name: Default  # Self-hosted agent pool
 
-jobs:
-- job: BuildAndPublish
-  steps:
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'build'
-        projects: '**/*.csproj'
+steps:
+- script: |
+    copy "C:\Users\Kshitija\drop.zip" "$(Build.ArtifactStagingDirectory)\drop.zip"
+  displayName: 'Copy drop.zip to staging folder'
 
-    - task: PublishBuildArtifacts@1
-      inputs:
-        pathToPublish: '$(Build.ArtifactStagingDirectory)/drop.zip'
-        artifactName: 'myartifact'
-
-- job: UploadToBlob
-  dependsOn: BuildAndPublish
-  steps:
-    - task: DownloadBuildArtifacts@0
-      inputs:
-        buildType: 'current'
-        downloadType: 'single'
-        artifactName: 'myartifact'
-        downloadPath: '$(Pipeline.Workspace)'
-
-    - task: AzureCLI@2
-      inputs:
-        azureSubscription: 'ServiceConnection_Automatic'  # Change this to your connection name
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          az storage blob upload \
-            --account-name kshitijastore01 \  # Change this to your storage account name
-            --container-name mycontainer \    # Change this to your container name
-            --name drop.zip \
-            --file "$(Pipeline.Workspace)/myartifact/drop.zip" \
-            --auth-mode login
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\drop.zip'
+    ArtifactName: 'drop'
