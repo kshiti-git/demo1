@@ -2,12 +2,11 @@
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
-
 trigger:
 - main
 
 pool:
-  name: Default  # Self-hosted agent pool
+  name: Default  # Use your self-hosted agent pool name
 
 steps:
 - script: |
@@ -18,19 +17,18 @@ steps:
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)\drop.zip'
     ArtifactName: 'drop'
+  displayName: 'Publish drop.zip as artifact'
 
-# Upload to Azure Blob
 - task: AzureCLI@2
   inputs:
-    azureSubscription: 'ServiceConnection_Automatic'  # Replace with your service connection name
+    azureSubscription: 'ServiceConnection_Automatic'  # Replace with your real service connection name
     scriptType: 'ps'
     scriptLocation: 'inlineScript'
     inlineScript: |
       az storage blob upload `
-        --account-name kshitijastore1`
+        --account-name kshitijastore2 `
         --container-name mycontainer `
         --name drop.zip `
         --file "$(Build.ArtifactStagingDirectory)\drop.zip" `
         --auth-mode login
-  displayName: 'Upload to Azure Blob Storage'
-
+  displayName: 'Upload drop.zip to Azure Blob Storage'
